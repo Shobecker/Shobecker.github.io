@@ -1,14 +1,18 @@
-const colorSlider = document.getElementById('colorSlider');
+const redSlider = document.getElementById('redSlider');
+const greenSlider = document.getElementById('greenSlider');
+const blueSlider = document.getElementById('blueSlider');
 const opacitySlider = document.getElementById('opacitySlider');
 
-colorSlider.addEventListener('input', () => {
-    const color = colorSlider.value;
-    const opacity = opacitySlider.value;
-    document.body.style.backgroundColor = `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`;
-});
+function updateBackground() {
+    const redValue = redSlider.value;
+    const greenValue = greenSlider.value;
+    const blueValue = blueSlider.value;
+    const opacityValue = opacitySlider.value;
+    document.body.style.backgroundColor = `rgba(${redValue}, ${greenValue}, ${blueValue}, ${opacityValue})`;
+}
 
-opacitySlider.addEventListener('input', () => {
-    const color = colorSlider.value;
-    const opacity = opacitySlider.value;
-    document.body.style.backgroundColor = `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`;
-});
+// Add event listeners for all sliders
+redSlider.addEventListener('input', updateBackground);
+greenSlider.addEventListener('input', updateBackground);
+blueSlider.addEventListener('input', updateBackground);
+opacitySlider.addEventListener('input', updateBackground);
