@@ -16,3 +16,6 @@ redSlider.addEventListener('input', updateBackground);
 greenSlider.addEventListener('input', updateBackground);
 blueSlider.addEventListener('input', updateBackground);
 opacitySlider.addEventListener('input', updateBackground);
+
+// Initialize the background color on load
+updateBackground();
