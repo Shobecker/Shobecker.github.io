@@ -9,24 +9,26 @@ body {
 
 h1 {
     color: inherit; /* Inherit text color from body */
+    text-align: center; /* Center the header text */
 }
 
-/* Slider container styling */
+/* Styling for the slider container to align items on the same line */
 .slider-container {
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Center icons and sliders vertically */
-    margin-top: 20px; /* Add some space between sliders */
+    display: flex; /* Use flexbox to align items horizontally */
+    align-items: center; /* Vertically center the icons and sliders */
+    margin-top: 20px; /* Space between sliders */
+    justify-content: center; /* Center the container in the middle of the page */
 }
 
 /* Icon styling */
 .slider-container i {
-    font-size: 20px; /* Icon size */
-    margin: 0 10px; /* Space around icons */
+    font-size: 24px; /* Icon size */
+    margin: 0 10px; /* Space around the icons */
 }
 
 /* Slider styling */
 input[type="range"] {
-    width: 100%; /* Make the slider take full width of the container */
+    width: 60%; /* Make the slider take 60% of the container width */
     margin: 0; /* Remove default margin */
     -webkit-appearance: none; /* Remove default styling for better appearance */
     background: transparent; /* Remove default background */
@@ -62,11 +64,4 @@ input[type="range"]::-moz-range-thumb {
     width: 20px; /* Customize thumb width for Firefox */
     background: #4CAF50; /* Green thumb color for Firefox */
     border-radius: 50%; /* Make thumb circular for Firefox */
-    cursor: pointer; /* Change cursor on hover */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
-}
-
-/* Focus styling */
-input[type="range"]:focus {
-    outline: none; /* Remove focus outline */
-}
+    cursor: pointer; /* Change cursor on hove
