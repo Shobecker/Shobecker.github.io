@@ -15,35 +15,51 @@ h1 {
 label {
     display: block; /* Make label block-level to stack vertically */
     margin-top: 20px; /* Add some space above each label */
+    font-weight: bold; /* Make label text bold */
 }
 
 input[type="range"] {
     width: 100%; /* Make the slider take full width of the container */
     margin-top: 5px; /* Add space between label and slider */
     -webkit-appearance: none; /* Remove default styling for better appearance */
+    background: transparent; /* Remove default background */
 }
 
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; /* Remove default thumb styling */
-    height: 15px; /* Customize thumb height */
-    width: 15px; /* Customize thumb width */
-    background: #333; /* Customize thumb color */
-    cursor: pointer; /* Change cursor on hover */
-}
-
+/* Track styling */
 input[type="range"]::-webkit-slider-runnable-track {
-    height: 5px; /* Customize track height */
-    background: #ccc; /* Customize track color */
-}
-
-input[type="range"]::-moz-range-thumb {
-    height: 15px; /* Customize thumb height for Firefox */
-    width: 15px; /* Customize thumb width for Firefox */
-    background: #333; /* Customize thumb color for Firefox */
-    cursor: pointer; /* Change cursor on hover */
+    height: 8px; /* Customize track height */
+    background: #ddd; /* Light gray track color */
+    border-radius: 5px; /* Rounded track corners */
 }
 
 input[type="range"]::-moz-range-track {
-    height: 5px; /* Customize track height for Firefox */
-    background: #ccc; /* Customize track color for Firefox */
+    height: 8px; /* Customize track height for Firefox */
+    background: #ddd; /* Light gray track color */
+    border-radius: 5px; /* Rounded track corners */
+}
+
+/* Thumb styling */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Remove default thumb styling */
+    height: 20px; /* Customize thumb height */
+    width: 20px; /* Customize thumb width */
+    background: #4CAF50; /* Green thumb color */
+    border-radius: 50%; /* Make thumb circular */
+    cursor: pointer; /* Change cursor on hover */
+    margin-top: -6px; /* Center the thumb on the track */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
+}
+
+input[type="range"]::-moz-range-thumb {
+    height: 20px; /* Customize thumb height for Firefox */
+    width: 20px; /* Customize thumb width for Firefox */
+    background: #4CAF50; /* Green thumb color for Firefox */
+    border-radius: 50%; /* Make thumb circular for Firefox */
+    cursor: pointer; /* Change cursor on hover */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Add a shadow for depth */
+}
+
+/* Focus styling */
+input[type="range"]:focus {
+    outline: none; /* Remove focus outline */
 }
