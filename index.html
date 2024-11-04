@@ -1,7 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Color and Opacity Slider</title>
+</head>
 <body>
-<h1>The Soyest Boy</h1>
-<p>Hosted with GitHub Pages.</p>
+    <h1>Customize Background</h1>
+    <label for="colorSlider">Choose Background Color:</label>
+    <input type="color" id="colorSlider" value="#ffffff">
+
+    <label for="opacitySlider">Adjust Opacity:</label>
+    <input type="range" id="opacitySlider" min="0" max="1" step="0.1" value="1">
+
+    <script src="script.js"></script>
 </body>
 </html>
