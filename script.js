@@ -2,9 +2,13 @@ const colorSlider = document.getElementById('colorSlider');
 const opacitySlider = document.getElementById('opacitySlider');
 
 colorSlider.addEventListener('input', () => {
-    document.body.style.backgroundColor = colorSlider.value;
+    const color = colorSlider.value;
+    const opacity = opacitySlider.value;
+    document.body.style.backgroundColor = `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`;
 });
 
 opacitySlider.addEventListener('input', () => {
-    document.body.style.opacity = opacitySlider.value;
-})
+    const color = colorSlider.value;
+    const opacity = opacitySlider.value;
+    document.body.style.backgroundColor = `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}`;
+});
