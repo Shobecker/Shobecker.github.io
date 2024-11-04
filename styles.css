@@ -3,8 +3,10 @@ body {
     margin: 0;
     padding: 20px;
     transition: background-color 0.3s ease, opacity 0.3s ease;
+    background-color: #ffffff; /* Default background color */
+    color: #333; /* Text color */  /* Added to ensure text color remains consistent */
 }
 
 h1 {
-    color: #333;
+    color: inherit; /* Inherit text color from body */
 }
