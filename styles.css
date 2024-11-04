@@ -11,16 +11,23 @@ h1 {
     color: inherit; /* Inherit text color from body */
 }
 
-/* Stack sliders and make them full width */
-label {
-    display: block; /* Make label block-level to stack vertically */
-    margin-top: 20px; /* Add some space above each label */
-    font-weight: bold; /* Make label text bold */
+/* Slider container styling */
+.slider-container {
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center icons and sliders vertically */
+    margin-top: 20px; /* Add some space between sliders */
 }
 
+/* Icon styling */
+.slider-container i {
+    font-size: 20px; /* Icon size */
+    margin: 0 10px; /* Space around icons */
+}
+
+/* Slider styling */
 input[type="range"] {
     width: 100%; /* Make the slider take full width of the container */
-    margin-top: 5px; /* Add space between label and slider */
+    margin: 0; /* Remove default margin */
     -webkit-appearance: none; /* Remove default styling for better appearance */
     background: transparent; /* Remove default background */
 }
