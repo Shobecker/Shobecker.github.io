@@ -19,6 +19,10 @@
       background-color: #222;
       border-radius: 50%;
       box-shadow: 0 0 20px #0f0;
+      width: 80vw;
+      height: 80vw;
+      max-width: 300px;
+      max-height: 300px;
     }
 
     #clock {
@@ -63,28 +67,44 @@
     input[type="number"] {
       width: 50px;
     }
+
+    #toggleTimer {
+      margin-top: 10px;
+      padding: 5px 10px;
+      font-size: 1em;
+      background-color: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #toggleTimer:hover {
+      background-color: #0c0;
+    }
   </style>
 </head>
 <body>
 
-  <div id="controls">
+  <section id="controls">
     <label>
       🔈 Volume:
-      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" aria-label="Volume slider">
     </label>
     <label>
-      🔇 <input type="checkbox" id="muteToggle"> Mute
+      🔇 <input type="checkbox" id="muteToggle" aria-label="Mute toggle"> Mute
     </label>
     <label>
       ⏱ Interval (min):
-      <input type="number" id="intervalInput" min="1" value="5">
+      <input type="number" id="intervalInput" min="1" value="5" aria-label="Interval in minutes">
     </label>
-  </div>
+    <button id="toggleTimer" aria-label="Start or pause the timer">⏯ Start/Pause</button>
+  </section>
 
   <div id="flash"></div>
 
-  <canvas id="analogClock" width="300" height="300"></canvas>
-  <div id="clock">--:--:--</div>
+  <canvas id="analogClock" width="300" height="300" aria-label="Analog clock"></canvas>
+  <div id="clock" aria-live="polite">--:--:--</div>
   <div id="interval">Next alert in: 05:00</div>
 
   <script>
@@ -98,17 +118,25 @@
     ctx.translate(radius, radius);
     const clockRadius = radius * 0.90;
 
+    const volumeSlider = document.getElementById("volumeSlider");
+    const muteToggle = document.getElementById("muteToggle");
+    const toggleTimerBtn = document.getElementById("toggleTimer");
+
     // Timer state
     let intervalDuration = parseInt(intervalInput.value) * 60;
     let intervalRemaining = intervalDuration;
+    let isRunning = true;
 
     // Audio
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let volume = 0.5;
     let muted = false;
 
-    const volumeSlider = document.getElementById("volumeSlider");
-    const muteToggle = document.getElementById("muteToggle");
+    document.body.addEventListener('click', () => {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }, { once: true });
 
     volumeSlider.addEventListener("input", () => {
       volume = parseFloat(volumeSlider.value);
@@ -149,6 +177,11 @@
       const minutes = Math.max(1, parseInt(intervalInput.value) || 1);
       intervalDuration = minutes * 60;
       intervalRemaining = intervalDuration;
+    });
+
+    toggleTimerBtn.addEventListener("click", () => {
+      isRunning = !isRunning;
+      toggleTimerBtn.textContent = isRunning ? "⏸ Pause" : "▶️ Start";
     });
 
     // Clock drawing
@@ -228,6 +261,8 @@
     }
 
     function updateIntervalTimer() {
+      if (!isRunning) return;
+
       if (intervalRemaining <= 0) {
         playBeep();
         triggerFlash();
