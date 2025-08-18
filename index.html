@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Analog Clock with Sound Alert and Timer</title>
+  <title>Custom Interval Clock</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -38,6 +38,9 @@
       color: #0f0;
       font-size: 0.9em;
       text-align: left;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      border-radius: 5px;
     }
 
     #controls label {
@@ -56,6 +59,10 @@
       pointer-events: none;
       transition: opacity 0.5s ease-out;
     }
+
+    input[type="number"] {
+      width: 50px;
+    }
   </style>
 </head>
 <body>
@@ -68,6 +75,10 @@
     <label>
       🔇 <input type="checkbox" id="muteToggle"> Mute
     </label>
+    <label>
+      ⏱ Interval (min):
+      <input type="number" id="intervalInput" min="1" value="5">
+    </label>
   </div>
 
   <div id="flash"></div>
@@ -77,19 +88,21 @@
   <div id="interval">Next alert in: 05:00</div>
 
   <script>
-    // Clock setup
+    // Elements
     const digitalClock = document.getElementById("clock");
     const intervalDisplay = document.getElementById("interval");
+    const intervalInput = document.getElementById("intervalInput");
     const canvas = document.getElementById("analogClock");
     const ctx = canvas.getContext("2d");
     const radius = canvas.height / 2;
     ctx.translate(radius, radius);
     const clockRadius = radius * 0.90;
 
-    let intervalDuration = 5 * 60; // 5 minutes in seconds
+    // Timer state
+    let intervalDuration = parseInt(intervalInput.value) * 60;
     let intervalRemaining = intervalDuration;
 
-    // Sound setup
+    // Audio
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let volume = 0.5;
     let muted = false;
@@ -113,7 +126,6 @@
 
       oscillator.type = "sine";
       oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
-
       gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
 
       oscillator.connect(gainNode);
@@ -123,9 +135,8 @@
       oscillator.stop(audioCtx.currentTime + 0.2);
     }
 
-    // Flash effect
+    // Flash
     const flash = document.getElementById("flash");
-
     function triggerFlash() {
       flash.style.opacity = "1";
       setTimeout(() => {
@@ -133,7 +144,14 @@
       }, 100);
     }
 
-    // Drawing functions
+    // Interval input change
+    intervalInput.addEventListener("change", () => {
+      const minutes = Math.max(1, parseInt(intervalInput.value) || 1);
+      intervalDuration = minutes * 60;
+      intervalRemaining = intervalDuration;
+    });
+
+    // Clock drawing
     function drawClock() {
       drawFace(ctx, clockRadius);
       drawNumbers(ctx, clockRadius);
@@ -211,7 +229,6 @@
 
     function updateIntervalTimer() {
       if (intervalRemaining <= 0) {
-        // Trigger actions
         playBeep();
         triggerFlash();
         intervalRemaining = intervalDuration;
@@ -232,7 +249,7 @@
       }, 1000);
     }
 
-    // Initial render
+    // Init
     drawClock();
     updateDigitalClock();
     startClock();
