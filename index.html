@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Analog & Digital Clock with 5-Minute Alerts</title>
+  <title>Analog & Digital Clock with 5-Minute Interval Timer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,11 +21,11 @@
 
     #clock {
       font-size: 3em;
-      margin: 20px 0;
+      margin: 20px 0 10px 0;
     }
 
-    #status {
-      font-size: 1.2em;
+    #interval {
+      font-size: 1.5em;
       color: #fff;
     }
   </style>
@@ -34,16 +34,19 @@
 
   <canvas id="analogClock" width="300" height="300"></canvas>
   <div id="clock">--:--:--</div>
-  <div id="status">Waiting for next alert...</div>
+  <div id="interval">Next alert in: 05:00</div>
 
   <script>
     const digitalClock = document.getElementById("clock");
-    const statusText = document.getElementById("status");
+    const intervalDisplay = document.getElementById("interval");
     const canvas = document.getElementById("analogClock");
     const ctx = canvas.getContext("2d");
     const radius = canvas.height / 2;
-    ctx.translate(radius, radius); // Move to center
+    ctx.translate(radius, radius);
     const clockRadius = radius * 0.90;
+
+    let intervalDuration = 5 * 60; // 5 minutes in seconds
+    let intervalRemaining = intervalDuration;
 
     function drawClock() {
       drawFace(ctx, clockRadius);
@@ -90,18 +93,15 @@
       let minute = now.getMinutes();
       let second = now.getSeconds();
 
-      // Hour
       hour = hour % 12;
-      hour = (hour * Math.PI / 6) + 
+      hour = (hour * Math.PI / 6) +
              (minute * Math.PI / (6 * 60)) +
              (second * Math.PI / (360 * 60));
       drawHand(ctx, hour, radius * 0.5, radius * 0.07);
 
-      // Minute
       minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
       drawHand(ctx, minute, radius * 0.75, radius * 0.07);
 
-      // Second
       second = (second * Math.PI / 30);
       drawHand(ctx, second, radius * 0.85, radius * 0.02, "#f00");
     }
@@ -123,24 +123,26 @@
       digitalClock.textContent = now.toLocaleTimeString();
     }
 
-    function startClock() {
-      let lastAlert = Date.now();
+    function updateIntervalTimer() {
+      if (intervalRemaining <= 0) {
+        intervalRemaining = intervalDuration; // Reset timer
+      }
 
+      const mins = Math.floor(intervalRemaining / 60);
+      const secs = intervalRemaining % 60;
+      intervalDisplay.textContent = `Next alert in: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      intervalRemaining--;
+    }
+
+    function startClock() {
       setInterval(() => {
-        ctx.clearRect(-radius, -radius, canvas.width, canvas.height); // clear
+        ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
         drawClock();
         updateDigitalClock();
-
-        const now = Date.now();
-        if (now - lastAlert >= 5 * 60 * 1000) {
-          alert("🔔 5-minute alert!");
-          statusText.textContent = "Last alert: " + new Date().toLocaleTimeString();
-          lastAlert = now;
-        }
+        updateIntervalTimer();
       }, 1000);
     }
 
-    // Initialize
     drawClock();
     updateDigitalClock();
     startClock();
