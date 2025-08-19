@@ -45,7 +45,7 @@
       rgba(0, 0, 0, 0.6); 
       padding: 10px; 
       border-radius: 5px;
-     } 
+    } 
     #controls label { 
       display: block; 
       margin-bottom: 5px; }
@@ -107,9 +107,6 @@
       <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" aria-label="Volume slider">
     </label>
     <label>
-      🔇 <input type="checkbox" id="muteToggle" aria-label="Mute toggle"> Mute
-    </label>
-    <label>
       ⏱ Interval (min):
       <input type="number" id="intervalInput" min="1" value="5" aria-label="Interval in minutes">
     </label>
@@ -141,7 +138,6 @@
     const clockRadius = radius * 0.90;
 
     const volumeSlider = document.getElementById("volumeSlider");
-    const muteToggle = document.getElementById("muteToggle");
     const toggleTimerBtn = document.getElementById("toggleTimer");
     const testBeepBtn = document.getElementById("testBeep");
 
@@ -157,7 +153,6 @@
     // Audio
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let volume = 0.5;
-    let muted = false;
 
     // Bar close timer
     let barCloseRunning = false;
@@ -186,12 +181,7 @@
       volume = parseFloat(volumeSlider.value);
     });
 
-    muteToggle.addEventListener("change", () => {
-      muted = muteToggle.checked;
-    });
-
     function playBeep() {
-      if (muted) return;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
 
