@@ -35,19 +35,20 @@
       color: #fff;
     }
 
-    #controls {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    @media (max-width: 500px) {
-      #controls {
-        font-size: 0.8em;
-        left: 5px;
-        top: 5px;
-        padding: 6px;
-      }
-    }
+    #controls { 
+      position: absolute; 
+      top: 10px; left: 10px; 
+      color: #0f0; 
+      font-size: 0.9em; 
+      text-align: left; 
+      background-color: 
+      rgba(0, 0, 0, 0.6); 
+      padding: 10px; 
+      border-radius: 5px;
+     } 
+    #controls label { 
+      display: block; 
+      margin-bottom: 5px; }
 
     #controls label {
       display: block;
@@ -114,6 +115,12 @@
     </label>
     <button id="toggleTimer" aria-label="Start or pause the timer">⏯ Start/Pause</button>
     <button id="testBeep" aria-label="Test alert sound">🔊 Test Alert Sound</button>
+    <label>
+      📊 Shift (seconds):
+      <input type="number" id="barShiftInput" value="0" aria-label="Shift seconds">
+    </label>
+    <button id="barCloseTimer">📊 Start Bar Close Timer</button>
+    <div id="barCloseDisplay">Next bar close in: --:--</div>
   </section>
 
   <div id="flash"></div>
@@ -138,6 +145,10 @@
     const toggleTimerBtn = document.getElementById("toggleTimer");
     const testBeepBtn = document.getElementById("testBeep");
 
+    const barCloseBtn = document.getElementById("barCloseTimer");
+    const barCloseDisplay = document.getElementById("barCloseDisplay");
+    const barShiftInput = document.getElementById("barShiftInput");
+
     // Timer state
     let intervalDuration = parseInt(intervalInput.value) * 60;
     let intervalRemaining = intervalDuration;
@@ -147,6 +158,22 @@
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     let volume = 0.5;
     let muted = false;
+
+    // Bar close timer
+    let barCloseRunning = false;
+    let barShiftSeconds = 0;
+
+    // Update bar close display every second
+    barCloseBtn.addEventListener("click", () => {
+      barCloseRunning = !barCloseRunning;
+      barCloseBtn.textContent = barCloseRunning 
+        ? "⏸ Pause Bar Close Timer" 
+        : "📊 Start Bar Close Timer";
+    });
+
+    barShiftInput.addEventListener("change", () => {
+      barShiftSeconds = parseInt(barShiftInput.value) || 0;
+    });
 
     // Resume audio on first user interaction
     document.body.addEventListener('click', () => {
@@ -326,10 +353,38 @@
       }, 1000);
     }
 
+    function updateBarCloseTimer() {
+      if (!barCloseRunning) return;
+
+      const now = new Date();
+      const totalSeconds = now.getMinutes() * 60 + now.getSeconds();
+
+      // Find next multiple of 300s (5 minutes) + shift
+      let nextClose = Math.ceil((totalSeconds - barShiftSeconds) / 300) * 300 + barShiftSeconds;
+      if (nextClose <= totalSeconds) {
+        nextClose += 300; // ensure it's in the future
+      }
+
+      const remaining = nextClose - totalSeconds;
+
+      // Display
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      barCloseDisplay.textContent = `Next bar close in: ${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+
+      // Trigger at zero
+      if (remaining === 0) {
+        playBeep();
+        triggerFlash();
+      }
+    }
+
+
     // Init
     drawClock();
     updateDigitalClock();
     startClock();
+    updateBarCloseTimer();
   </script>
 </body>
 </html>
