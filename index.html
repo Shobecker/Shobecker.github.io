@@ -36,15 +36,17 @@
     }
 
     #controls {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: #0f0;
-      font-size: 0.9em;
-      text-align: left;
-      background-color: rgba(0, 0, 0, 0.6);
-      padding: 10px;
-      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    @media (max-width: 500px) {
+      #controls {
+        font-size: 0.8em;
+        left: 5px;
+        top: 5px;
+        padding: 6px;
+      }
     }
 
     #controls label {
@@ -58,7 +60,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: white;
+      background: #0f0;
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s ease-out;
@@ -163,19 +165,20 @@
 
     function playBeep() {
       if (muted) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
 
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+      osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.2);
 
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
-      gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
 
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
 
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
     }
 
     // Flash
