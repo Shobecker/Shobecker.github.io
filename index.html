@@ -3,224 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Custom Interval Clock</title>
+  <title>Analog & Digital Clock with 5-Minute Alerts</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #111;
       color: #0f0;
       text-align: center;
-      margin: 0;
       padding-top: 5vh;
-      overflow: hidden;
     }
 
     canvas {
       background-color: #222;
       border-radius: 50%;
       box-shadow: 0 0 20px #0f0;
-      width: 80vw;
-      height: 80vw;
-      max-width: 300px;
-      max-height: 300px;
     }
 
     #clock {
       font-size: 3em;
-      margin: 20px 0 10px 0;
+      margin: 20px 0;
     }
 
-    #interval {
-      font-size: 1.5em;
+    #status {
+      font-size: 1.2em;
       color: #fff;
-    }
-
-    #controls { 
-      position: absolute; 
-      top: 10px; left: 10px; 
-      color: #0f0; 
-      font-size: 0.9em; 
-      text-align: left; 
-      background-color: 
-      rgba(0, 0, 0, 0.6); 
-      padding: 10px; 
-      border-radius: 5px;
-    } 
-    #controls label { 
-      display: block; 
-      margin-bottom: 5px; }
-
-    #controls label {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    #flash {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #0f0;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease-out;
-    }
-
-    input[type="number"] {
-      width: 50px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 5px 10px;
-      font-size: 1em;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    #toggleTimer {
-      background-color: #0f0;
-      color: #000;
-    }
-
-    #toggleTimer:hover {
-      background-color: #0c0;
-    }
-
-    #testBeep {
-      background-color: #444;
-      color: #0f0;
-    }
-
-    #testBeep:hover {
-      background-color: #666;
     }
   </style>
 </head>
 <body>
 
-  <section id="controls">
-    <label>
-      🔈 Volume:
-      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" aria-label="Volume slider">
-    </label>
-    <button id="testBeep" aria-label="Test alert sound">🔊 Test Alert Sound</button>
-    <label>
-      📊 Shift (seconds):
-      <input type="number" id="barShiftInput" value="0" aria-label="Shift seconds">
-    </label>
-    <button id="barCloseTimer">📊 Start Bar Close Timer</button>
-  </section>
-
-  <div id="flash"></div>
-
-  <canvas id="analogClock" width="300" height="300" aria-label="Analog clock"></canvas>
-  <div id="clock" aria-live="polite">--:--:--</div>
-  <div id="barCloseDisplay">Next bar close in: --:--</div>
+  <canvas id="analogClock" width="300" height="300"></canvas>
+  <div id="clock">--:--:--</div>
+  <div id="status">Waiting for next alert...</div>
 
   <script>
-    // Elements
     const digitalClock = document.getElementById("clock");
+    const statusText = document.getElementById("status");
     const canvas = document.getElementById("analogClock");
     const ctx = canvas.getContext("2d");
     const radius = canvas.height / 2;
-    ctx.translate(radius, radius);
+    ctx.translate(radius, radius); // Move to center
     const clockRadius = radius * 0.90;
 
-    const volumeSlider = document.getElementById("volumeSlider");
-    const testBeepBtn = document.getElementById("testBeep");
-    const barCloseBtn = document.getElementById("barCloseTimer");
-    const barShiftInput = document.getElementById("barShiftInput");
-
-    // Timer state
-    let intervalDuration = parseInt(intervalInput.value) * 60;
-    let intervalRemaining = intervalDuration;
-    let isRunning = true;
-
-    // Audio
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let volume = 0.5;
-
-    // Bar close timer
-    let barCloseRunning = true;
-    let barShiftSeconds = -15;
-
-    // Update bar close display every second
-    barCloseBtn.addEventListener("click", () => {
-      barCloseRunning = !barCloseRunning;
-      barCloseBtn.textContent = barCloseRunning 
-        ? "⏸ Pause Bar Close Timer" 
-        : "📊 Start Bar Close Timer";
-    });
-
-    barShiftInput.addEventListener("change", () => {
-      barShiftSeconds = parseInt(barShiftInput.value) || 0;
-    });
-
-    // Resume audio on first user interaction
-    document.body.addEventListener('click', () => {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    }, { once: true });
-
-    volumeSlider.addEventListener("input", () => {
-      volume = parseFloat(volumeSlider.value);
-    });
-
-    function playBeep() {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
-      osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.2);
-
-      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.3);
-    }
-
-    // Flash
-    const flash = document.getElementById("flash");
-    function triggerFlash() {
-      flash.style.opacity = "1";
-      setTimeout(() => {
-        flash.style.opacity = "0";
-      }, 100);
-    }
-
-    // Controls
-    intervalInput.addEventListener("change", () => {
-      const minutes = Math.max(1, parseInt(intervalInput.value) || 1);
-      intervalDuration = minutes * 60;
-      intervalRemaining = intervalDuration;
-    });
-    
-    toggleTimerBtn.addEventListener("click", () => {
-      isRunning = !isRunning;
-      toggleTimerBtn.textContent = isRunning ? "⏸ Pause" : "▶️ Start";
-    });
-
-    testBeepBtn.addEventListener("click", () => {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      playBeep();
-    });
-
-    // Clock Drawing
     function drawClock() {
       drawFace(ctx, clockRadius);
       drawNumbers(ctx, clockRadius);
       drawTime(ctx, clockRadius);
-      drawProgressArc(ctx, clockRadius * 0.9);
     }
 
     function drawFace(ctx, radius) {
@@ -262,15 +90,18 @@
       let minute = now.getMinutes();
       let second = now.getSeconds();
 
+      // Hour
       hour = hour % 12;
-      hour = (hour * Math.PI / 6) +
+      hour = (hour * Math.PI / 6) + 
              (minute * Math.PI / (6 * 60)) +
              (second * Math.PI / (360 * 60));
       drawHand(ctx, hour, radius * 0.5, radius * 0.07);
 
+      // Minute
       minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
       drawHand(ctx, minute, radius * 0.75, radius * 0.07);
 
+      // Second
       second = (second * Math.PI / 30);
       drawHand(ctx, second, radius * 0.85, radius * 0.02, "#f00");
     }
@@ -287,65 +118,29 @@
       ctx.rotate(-pos);
     }
 
-    function drawProgressArc(ctx, radius) {
-      if (intervalDuration <= 0) return; // avoid div by zero
-
-      const fraction = intervalRemaining / intervalDuration;
-      const startAngle = -Math.PI / 2; // top (12 o’clock)
-      const endAngle = startAngle + (2 * Math.PI * fraction);
-
-      ctx.beginPath();
-      ctx.arc(0, 0, radius, startAngle, endAngle, false);
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = "#0f0";
-      ctx.globalAlpha = 0.4; // translucent so it doesn’t overpower
-      ctx.stroke();
-      ctx.globalAlpha = 1.0; // reset
-    }
-
     function updateDigitalClock() {
       const now = new Date();
       digitalClock.textContent = now.toLocaleTimeString();
     }
 
-    function updateBarCloseTimer() {
-      if (!barCloseRunning) return;
-
-      const now = new Date();
-      const totalSeconds = now.getMinutes() * 60 + now.getSeconds();
-
-      // Find next multiple of 300s (5 minutes) + shift
-      let nextClose = Math.ceil((totalSeconds - barShiftSeconds) / 300) * 300 + barShiftSeconds;
-      if (nextClose <= totalSeconds) {
-        nextClose += 300; // ensure it's in the future
-      }
-
-      const remaining = nextClose - totalSeconds;
-
-      // Display
-      const mins = Math.floor(remaining / 60);
-      const secs = remaining % 60;
-      intervalDisplay.textContent = `Next alert in: ${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-      intervalRemaining--;
-
-      // Trigger at zero
-      if (remaining === 0) {
-        playBeep();
-        triggerFlash();
-      }
-    }
-
     function startClock() {
+      let lastAlert = Date.now();
+
       setInterval(() => {
-        ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
+        ctx.clearRect(-radius, -radius, canvas.width, canvas.height); // clear
         drawClock();
         updateDigitalClock();
-        updateIntervalTimer();
-        updateBarCloseTimer();
+
+        const now = Date.now();
+        if (now - lastAlert >= 5 * 60 * 1000) {
+          alert("🔔 5-minute alert!");
+          statusText.textContent = "Last alert: " + new Date().toLocaleTimeString();
+          lastAlert = now;
+        }
       }, 1000);
     }
 
-    // Init
+    // Initialize
     drawClock();
     updateDigitalClock();
     startClock();
