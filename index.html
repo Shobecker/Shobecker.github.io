@@ -80,11 +80,12 @@
 
     <label for="soundPicker">Alarm sound:</label>
     <select id="soundPicker" onchange="setSound()">
-      <option value="https://cdn.pixabay.com/audio/2022/03/15/audio_c8aafeb689.mp3">Soft Chime</option>
-      <option value="https://cdn.pixabay.com/audio/2022/03/15/audio_fdd78f96a9.mp3">Birdsong</option>
-      <option value="https://cdn.pixabay.com/audio/2022/03/15/audio_d7a9a86c14.mp3">Ocean Waves</option>
-      <option value="https://cdn.pixabay.com/audio/2022/03/15/audio_5a8e04d9e3.mp3">Gentle Guitar</option>
-    </select><br/>
+      <option value="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg">Soft Bell</option>
+      <option value="https://actions.google.com/sounds/v1/ambiences/birds_in_forest.ogg">Birdsong</option>
+      <option value="https://actions.google.com/sounds/v1/water/ocean_waves.ogg">Ocean Waves</option>
+      <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Gentle Guitar</option>
+    </select>
+
 
     <label for="volumeSlider">Volume:</label>
     <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value)"/><br/>
