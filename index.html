@@ -68,19 +68,31 @@
       width: 50px;
     }
 
-    #toggleTimer {
+    button {
       margin-top: 10px;
       padding: 5px 10px;
       font-size: 1em;
-      background-color: #0f0;
-      color: #000;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
 
+    #toggleTimer {
+      background-color: #0f0;
+      color: #000;
+    }
+
     #toggleTimer:hover {
       background-color: #0c0;
+    }
+
+    #testBeep {
+      background-color: #444;
+      color: #0f0;
+    }
+
+    #testBeep:hover {
+      background-color: #666;
     }
   </style>
 </head>
@@ -99,6 +111,7 @@
       <input type="number" id="intervalInput" min="1" value="5" aria-label="Interval in minutes">
     </label>
     <button id="toggleTimer" aria-label="Start or pause the timer">⏯ Start/Pause</button>
+    <button id="testBeep" aria-label="Test alert sound">🔊 Test Alert Sound</button>
   </section>
 
   <div id="flash"></div>
@@ -121,6 +134,7 @@
     const volumeSlider = document.getElementById("volumeSlider");
     const muteToggle = document.getElementById("muteToggle");
     const toggleTimerBtn = document.getElementById("toggleTimer");
+    const testBeepBtn = document.getElementById("testBeep");
 
     // Timer state
     let intervalDuration = parseInt(intervalInput.value) * 60;
@@ -132,6 +146,7 @@
     let volume = 0.5;
     let muted = false;
 
+    // Resume audio on first user interaction
     document.body.addEventListener('click', () => {
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -172,7 +187,7 @@
       }, 100);
     }
 
-    // Interval input change
+    // Controls
     intervalInput.addEventListener("change", () => {
       const minutes = Math.max(1, parseInt(intervalInput.value) || 1);
       intervalDuration = minutes * 60;
@@ -184,7 +199,14 @@
       toggleTimerBtn.textContent = isRunning ? "⏸ Pause" : "▶️ Start";
     });
 
-    // Clock drawing
+    testBeepBtn.addEventListener("click", () => {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      playBeep();
+    });
+
+    // Clock Drawing
     function drawClock() {
       drawFace(ctx, clockRadius);
       drawNumbers(ctx, clockRadius);
