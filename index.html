@@ -81,8 +81,6 @@
     <label for="soundPicker">Alarm sound:</label>
     <select id="soundPicker" onchange="setSound()">
       <option value="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg">Soft Bell</option>
-      <option value="https://actions.google.com/sounds/v1/ambiences/birds_in_forest.ogg">Birdsong</option>
-      <option value="https://actions.google.com/sounds/v1/water/ocean_waves.ogg">Ocean Waves</option>
       <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Gentle Guitar</option>
     </select>
 
@@ -95,6 +93,8 @@
       <option value="5">Every 5 minutes</option>
       <option value="10">Every 10 minutes (on the hour)</option>
     </select>
+
+    <button id="testAlarmBtn" onclick="testAlarmSound()">Test Alarm Sound</button>
   </div>
 
   <script>
@@ -184,8 +184,10 @@
       digitalClock.textContent = now.toLocaleTimeString();
     }
 
+    let alarmTimeout = null;
     function fadeInAlarm() {
       alarmSound.volume = 0;
+      alarmSound.currentTime = 0;
       alarmSound.play();
       let vol = 0;
       const fade = setInterval(() => {
@@ -193,6 +195,14 @@
         alarmSound.volume = vol;
         if (vol >= maxVolume) clearInterval(fade);
       }, 200);
+      if (alarmTimeout) clearTimeout(alarmTimeout);
+      alarmTimeout = setTimeout(() => {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+      }, 3000);
+      alarmSound.onended = () => {
+        if (alarmTimeout) clearTimeout(alarmTimeout);
+      };
     }
 
     function checkAlarm() {
@@ -221,6 +231,32 @@
     }
 
     // --- Controls ---
+
+    function testAlarmSound() {
+      const btn = document.getElementById("testAlarmBtn");
+      if (!alarmSound.paused && !alarmSound.ended && alarmSound.currentTime > 0) {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+        btn.textContent = "Test Alarm Sound";
+        if (alarmTimeout) clearTimeout(alarmTimeout);
+      } else {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+        alarmSound.volume = maxVolume;
+        alarmSound.play();
+        btn.textContent = "Stop Alarm Sound";
+        if (alarmTimeout) clearTimeout(alarmTimeout);
+        alarmTimeout = setTimeout(() => {
+          alarmSound.pause();
+          alarmSound.currentTime = 0;
+          btn.textContent = "Test Alarm Sound";
+        }, 3000);
+        alarmSound.onended = () => {
+          btn.textContent = "Test Alarm Sound";
+          if (alarmTimeout) clearTimeout(alarmTimeout);
+        };
+      }
+    }
     function setOffset() {
       const input = document.getElementById("offsetInput");
       let val = parseInt(input.value, 10);
