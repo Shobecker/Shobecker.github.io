@@ -106,31 +106,24 @@
       🔈 Volume:
       <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" aria-label="Volume slider">
     </label>
-    <label>
-      ⏱ Interval (min):
-      <input type="number" id="intervalInput" min="1" value="5" aria-label="Interval in minutes">
-    </label>
-    <button id="toggleTimer" aria-label="Start or pause the timer">⏯ Start/Pause</button>
     <button id="testBeep" aria-label="Test alert sound">🔊 Test Alert Sound</button>
     <label>
       📊 Shift (seconds):
       <input type="number" id="barShiftInput" value="0" aria-label="Shift seconds">
     </label>
     <button id="barCloseTimer">📊 Start Bar Close Timer</button>
-    <div id="barCloseDisplay">Next bar close in: --:--</div>
+    
   </section>
 
   <div id="flash"></div>
 
   <canvas id="analogClock" width="300" height="300" aria-label="Analog clock"></canvas>
   <div id="clock" aria-live="polite">--:--:--</div>
-  <div id="interval">Next alert in: 05:00</div>
+  <div id="barCloseDisplay">Next bar close in: --:--</div>
 
   <script>
     // Elements
     const digitalClock = document.getElementById("clock");
-    const intervalDisplay = document.getElementById("interval");
-    const intervalInput = document.getElementById("intervalInput");
     const canvas = document.getElementById("analogClock");
     const ctx = canvas.getContext("2d");
     const radius = canvas.height / 2;
@@ -138,11 +131,8 @@
     const clockRadius = radius * 0.90;
 
     const volumeSlider = document.getElementById("volumeSlider");
-    const toggleTimerBtn = document.getElementById("toggleTimer");
     const testBeepBtn = document.getElementById("testBeep");
-
     const barCloseBtn = document.getElementById("barCloseTimer");
-    const barCloseDisplay = document.getElementById("barCloseDisplay");
     const barShiftInput = document.getElementById("barShiftInput");
 
     // Timer state
@@ -155,8 +145,8 @@
     let volume = 0.5;
 
     // Bar close timer
-    let barCloseRunning = false;
-    let barShiftSeconds = 0;
+    let barCloseRunning = true;
+    let barShiftSeconds = -15;
 
     // Update bar close display every second
     barCloseBtn.addEventListener("click", () => {
@@ -208,12 +198,6 @@
     }
 
     // Controls
-    intervalInput.addEventListener("change", () => {
-      const minutes = Math.max(1, parseInt(intervalInput.value) || 1);
-      intervalDuration = minutes * 60;
-      intervalRemaining = intervalDuration;
-    });
-
     toggleTimerBtn.addEventListener("click", () => {
       isRunning = !isRunning;
       toggleTimerBtn.textContent = isRunning ? "⏸ Pause" : "▶️ Start";
@@ -319,30 +303,6 @@
       digitalClock.textContent = now.toLocaleTimeString();
     }
 
-    function updateIntervalTimer() {
-      if (!isRunning) return;
-
-      if (intervalRemaining <= 0) {
-        playBeep();
-        triggerFlash();
-        intervalRemaining = intervalDuration;
-      }
-
-      const mins = Math.floor(intervalRemaining / 60);
-      const secs = intervalRemaining % 60;
-      intervalDisplay.textContent = `Next alert in: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-      intervalRemaining--;
-    }
-
-    function startClock() {
-      setInterval(() => {
-        ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
-        drawClock();
-        updateDigitalClock();
-        updateIntervalTimer();
-      }, 1000);
-    }
-
     function updateBarCloseTimer() {
       if (!barCloseRunning) return;
 
@@ -360,7 +320,8 @@
       // Display
       const mins = Math.floor(remaining / 60);
       const secs = remaining % 60;
-      barCloseDisplay.textContent = `Next bar close in: ${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      intervalDisplay.textContent = `Next alert in: ${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      intervalRemaining--;
 
       // Trigger at zero
       if (remaining === 0) {
@@ -369,12 +330,20 @@
       }
     }
 
+    function startClock() {
+      setInterval(() => {
+        ctx.clearRect(-radius, -radius, canvas.width, canvas.height);
+        drawClock();
+        updateDigitalClock();
+        updateIntervalTimer();
+        updateBarCloseTimer();
+      }, 1000);
+    }
 
     // Init
     drawClock();
     updateDigitalClock();
     startClock();
-    updateBarCloseTimer();
   </script>
 </body>
 </html>
