@@ -214,6 +214,7 @@
       drawFace(ctx, clockRadius);
       drawNumbers(ctx, clockRadius);
       drawTime(ctx, clockRadius);
+      drawProgressArc(ctx, clockRadius * 0.9);
     }
 
     function drawFace(ctx, radius) {
@@ -278,6 +279,22 @@
       ctx.lineTo(0, -length);
       ctx.stroke();
       ctx.rotate(-pos);
+    }
+
+    function drawProgressArc(ctx, radius) {
+      if (intervalDuration <= 0) return; // avoid div by zero
+
+      const fraction = intervalRemaining / intervalDuration;
+      const startAngle = -Math.PI / 2; // top (12 o’clock)
+      const endAngle = startAngle + (2 * Math.PI * fraction);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, radius, startAngle, endAngle, false);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#0f0";
+      ctx.globalAlpha = 0.4; // translucent so it doesn’t overpower
+      ctx.stroke();
+      ctx.globalAlpha = 1.0; // reset
     }
 
     function updateDigitalClock() {
