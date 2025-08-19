@@ -112,7 +112,6 @@
       <input type="number" id="barShiftInput" value="0" aria-label="Shift seconds">
     </label>
     <button id="barCloseTimer">📊 Start Bar Close Timer</button>
-    
   </section>
 
   <div id="flash"></div>
@@ -198,6 +197,12 @@
     }
 
     // Controls
+    intervalInput.addEventListener("change", () => {
+      const minutes = Math.max(1, parseInt(intervalInput.value) || 1);
+      intervalDuration = minutes * 60;
+      intervalRemaining = intervalDuration;
+    });
+    
     toggleTimerBtn.addEventListener("click", () => {
       isRunning = !isRunning;
       toggleTimerBtn.textContent = isRunning ? "⏸ Pause" : "▶️ Start";
