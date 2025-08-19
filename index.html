@@ -34,7 +34,6 @@
 
   <canvas id="analogClock" width="300" height="300"></canvas>
   <div id="clock">--:--:--</div>
-  <div id="status">Waiting for next alert...</div>
 
   <script>
     const digitalClock = document.getElementById("clock");
@@ -124,19 +123,10 @@
     }
 
     function startClock() {
-      let lastAlert = Date.now();
-
       setInterval(() => {
         ctx.clearRect(-radius, -radius, canvas.width, canvas.height); // clear
         drawClock();
         updateDigitalClock();
-
-        const now = Date.now();
-        if (now - lastAlert >= 5 * 60 * 1000) {
-          alert("🔔 5-minute alert!");
-          statusText.textContent = "Last alert: " + new Date().toLocaleTimeString();
-          lastAlert = now;
-        }
       }, 1000);
     }
 
