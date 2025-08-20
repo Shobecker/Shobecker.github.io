@@ -94,7 +94,11 @@
       <option value="10">Every 10 minutes (on the hour)</option>
     </select>
 
-    <button id="testAlarmBtn" onclick="testAlarmSound()">Test Alarm Sound</button>
+  <label for="durationSlider">Alarm duration (seconds):</label>
+  <input type="range" id="durationSlider" min="1" max="10" step="1" value="3" oninput="setAlarmDuration(this.value)"/>
+  <span id="durationValue">3</span>s
+  <br/>
+  <button id="testAlarmBtn" onclick="testAlarmSound()">Test Alarm Sound</button>
   </div>
 
   <script>
@@ -106,10 +110,15 @@
     ctx.translate(radius, radius);
     const clockRadius = radius * 0.90;
 
-    let alarmOffsetSeconds = 0;
-    let alarmSound = new Audio(document.getElementById("soundPicker").value);
-    let maxVolume = 0.8;
-    let intervalMinutes = 5; // default
+  let alarmOffsetSeconds = 0;
+  let alarmSound = new Audio(document.getElementById("soundPicker").value);
+  let maxVolume = 0.8;
+  let intervalMinutes = 5; // default
+  let alarmDuration = parseInt(document.getElementById("durationSlider").value, 10) || 3;
+    function setAlarmDuration(val) {
+      alarmDuration = parseInt(val, 10) || 3;
+      document.getElementById("durationValue").textContent = alarmDuration;
+    }
 
     function drawClock() {
       drawFace(ctx, clockRadius);
@@ -199,7 +208,7 @@
       alarmTimeout = setTimeout(() => {
         alarmSound.pause();
         alarmSound.currentTime = 0;
-      }, 3000);
+      }, alarmDuration * 1000);
       alarmSound.onended = () => {
         if (alarmTimeout) clearTimeout(alarmTimeout);
       };
@@ -250,7 +259,7 @@
           alarmSound.pause();
           alarmSound.currentTime = 0;
           btn.textContent = "Test Alarm Sound";
-        }, 3000);
+        }, alarmDuration * 1000);
         alarmSound.onended = () => {
           btn.textContent = "Test Alarm Sound";
           if (alarmTimeout) clearTimeout(alarmTimeout);
