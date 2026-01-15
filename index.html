@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analog & Digital Clock with Customizable Alerts</title>
   <style>
     body {
@@ -42,7 +43,9 @@
       margin-right: 5px;
     }
 
-    input, select, button {
+    input,
+    select,
+    button {
       margin: 5px;
       padding: 5px 10px;
       font-size: 1em;
@@ -50,7 +53,8 @@
       border: none;
     }
 
-    input[type=number], input[type=range] {
+    input[type=number],
+    input[type=range] {
       width: 90px;
       text-align: center;
     }
@@ -67,6 +71,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <canvas id="analogClock" width="300" height="300" aria-label="Analog clock"></canvas>
@@ -75,19 +80,21 @@
 
   <div id="controls">
     <label for="offsetInput">Offset (seconds):</label>
-    <input type="number" id="offsetInput" value="-10" min="-59" max="59"/>
-    <button onclick="setOffset()">Apply</button><br/>
+    <input type="number" id="offsetInput" value="-10" min="-59" max="59" />
+    <button onclick="setOffset()">Apply</button><br />
 
     <label for="soundPicker">Alarm sound:</label>
     <select id="soundPicker" onchange="setSound()">
       <option value="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg">Soft Bell</option>
       <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Gentle Guitar</option>
-      <option value="https://www.myinstants.com/en/instant/japanese-yoooo/?utm_source=copy&utm_medium=share">Yooo</option>
+      <option value="./wake-up_42uLTpb.mp3">Wake Up</option>
+      <option value="./yooooooooooooooooooooooooo_4.mp3">Yoooooo</option>
     </select>
 
 
     <label for="volumeSlider">Volume:</label>
-    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value)"/><br/>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8"
+      oninput="setVolume(this.value)" /><br />
 
     <label for="intervalPicker">Alarm interval:</label>
     <select id="intervalPicker" onchange="setIntervalMode()">
@@ -95,11 +102,12 @@
       <option value="10">Every 10 minutes (on the hour)</option>
     </select>
 
-  <label for="durationSlider">Alarm duration (seconds):</label>
-  <input type="range" id="durationSlider" min="1" max="10" step="1" value="3" oninput="setAlarmDuration(this.value)"/>
-  <span id="durationValue">3</span>s
-  <br/>
-  <button id="testAlarmBtn" onclick="testAlarmSound()">Test Alarm Sound</button>
+    <label for="durationSlider">Alarm duration (seconds):</label>
+    <input type="range" id="durationSlider" min="1" max="10" step="1" value="3"
+      oninput="setAlarmDuration(this.value)" />
+    <span id="durationValue">3</span>s
+    <br />
+    <button id="testAlarmBtn" onclick="testAlarmSound()">Test Alarm Sound</button>
   </div>
 
   <script>
@@ -111,11 +119,11 @@
     ctx.translate(radius, radius);
     const clockRadius = radius * 0.90;
 
-  let alarmOffsetSeconds = 0;
-  let alarmSound = new Audio(document.getElementById("soundPicker").value);
-  let maxVolume = 0.8;
-  let intervalMinutes = 5; // default
-  let alarmDuration = parseInt(document.getElementById("durationSlider").value, 10) || 3;
+    let alarmOffsetSeconds = 0;
+    let alarmSound = new Audio(document.getElementById("soundPicker").value);
+    let maxVolume = 0.8;
+    let intervalMinutes = 5; // default
+    let alarmDuration = parseInt(document.getElementById("durationSlider").value, 10) || 3;
     function setAlarmDuration(val) {
       alarmDuration = parseInt(val, 10) || 3;
       document.getElementById("durationValue").textContent = alarmDuration;
@@ -165,9 +173,9 @@
       let second = now.getSeconds();
 
       hour = hour % 12;
-      hour = (hour * Math.PI / 6) + 
-             (minute * Math.PI / (6 * 60)) +
-             (second * Math.PI / (360 * 60));
+      hour = (hour * Math.PI / 6) +
+        (minute * Math.PI / (6 * 60)) +
+        (second * Math.PI / (360 * 60));
       drawHand(ctx, hour, radius * 0.5, radius * 0.07);
 
       minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
@@ -221,7 +229,7 @@
       const intervalSeconds = intervalMinutes * 60;
 
       if ((totalSeconds - alarmOffsetSeconds + intervalSeconds) % intervalSeconds === 0 &&
-          now.getSeconds() === ((alarmOffsetSeconds % 60 + 60) % 60)) {
+        now.getSeconds() === ((alarmOffsetSeconds % 60 + 60) % 60)) {
         fadeInAlarm();
       }
 
@@ -233,7 +241,7 @@
     }
 
     function tick() {
-      ctx.clearRect(-canvas.width/2, -canvas.height/2, canvas.width, canvas.height);
+      ctx.clearRect(-canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
       drawClock();
       updateDigitalClock();
       checkAlarm();
@@ -298,4 +306,5 @@
     tick();
   </script>
 </body>
+
 </html>
