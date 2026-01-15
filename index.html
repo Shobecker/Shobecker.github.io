@@ -119,8 +119,18 @@
     ctx.translate(radius, radius);
     const clockRadius = radius * 0.90;
 
+
+    // Web Audio API Context for volume boost
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+    const gainNode = audioCtx.createGain();
+    gainNode.gain.value = 3.0; // Boost volume by 3x
+    gainNode.connect(audioCtx.destination);
+
     let alarmOffsetSeconds = 0;
-    let alarmSound = new Audio(document.getElementById("soundPicker").value);
+    let alarmSound = null; // Will be initialized in setSound
+    setTimeout(setSound, 100); // Initialize sound after load
+
     let maxVolume = 0.8;
     let intervalMinutes = 5; // default
     let alarmDuration = parseInt(document.getElementById("durationSlider").value, 10) || 3;
@@ -251,6 +261,10 @@
     // --- Controls ---
 
     function testAlarmSound() {
+      // Ensure AudioContext is running
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
       const btn = document.getElementById("testAlarmBtn");
       if (!alarmSound.paused && !alarmSound.ended && alarmSound.currentTime > 0) {
         alarmSound.pause();
@@ -288,7 +302,32 @@
 
     function setSound() {
       const picker = document.getElementById("soundPicker");
+      const isLocal = !picker.value.startsWith("http");
+
+      // Pause existing if playing
+      if (alarmSound && !alarmSound.paused) {
+        alarmSound.pause();
+      }
+
       alarmSound = new Audio(picker.value);
+
+      // If local file, route through GainNode for boost
+      // Note: This requires the file to be served same-origin (or usually fine for local files in some browsers, but specifically helpful for the github.io case)
+      if (isLocal) {
+        // We must handle the case where createMediaElementSource might fail if CORS is an issue on some local setups, 
+        // but for the user's request (too quiet), we assume standard deployment.
+        try {
+          const source = audioCtx.createMediaElementSource(alarmSound);
+          source.connect(gainNode);
+        } catch (e) {
+          console.warn("Could not boost volume (CORS or other issue):", e);
+        }
+      }
+
+      // Resume context if suspended
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
     }
 
     function setVolume(value) {
