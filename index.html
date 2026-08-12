@@ -124,7 +124,7 @@
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
     const gainNode = audioCtx.createGain();
-    gainNode.gain.value = 3.0; // Boost volume by 3x
+    gainNode.gain.value = 2.0; // Boost volume by 2x
     gainNode.connect(audioCtx.destination);
 
     let alarmOffsetSeconds = 0;
